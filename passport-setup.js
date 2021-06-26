@@ -30,7 +30,12 @@ passport.deserializeUser(async function (id, done) {
     // response
     //   .status(200)
     //   .send({ token, username: user.username, name: user.name });
-    const resObj = { token, username: user.username, name: user.name };
+    const resObj = {
+      token,
+      email: user.email,
+      username: user.username,
+      name: user.name,
+    };
     console.log(resObj);
     console.log("aaaa");
     done(null, resObj);
@@ -54,10 +59,12 @@ passport.use(
       console.log("user =>", user);
       if (!user) {
         console.log("user =>", user);
+        console.log("profile: ", profile);
 
         const newUser = new User({
           username: profile.id,
           name: profile.displayName,
+          email: profile.emails[0].value,
           passwordHash: "123123123123123",
         });
 
