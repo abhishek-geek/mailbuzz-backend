@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 
 const mailSchema = new mongoose.Schema({
+  from: {
+    type: String,
+    required: true,
+  },
   to: {
     type: String,
     required: true,

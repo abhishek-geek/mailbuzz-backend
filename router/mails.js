@@ -3,18 +3,31 @@ const Mail = require("../model/mail");
 require("express-async-errors");
 
 mailsRouter.get("/", async (req, res) => {
-  const allMails = await Mail.find({});
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "Login first!" });
+  }
+  const from = req.user.email;
+  const allMails = await Mail.find({ from });
   res.status(200).json(allMails);
 });
 
 mailsRouter.get("/future", async (req, res) => {
-  const allMails = await Mail.find({});
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "Login first!" });
+  }
+  const allMails = await Mail.find({ from: user.email });
   const currDate = new Date();
   const filteredMails = allMails.filter((mail) => mail.nextDate > currDate);
   res.status(200).json(filteredMails);
 });
 
 mailsRouter.put("/future/:id", async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "Login first!" });
+  }
   const id = req.params.id;
   const body = req.body;
 
@@ -58,7 +71,11 @@ mailsRouter.put("/future/:id", async (req, res) => {
 });
 
 mailsRouter.get("/past", async (req, res) => {
-  const allMails = await Mail.find({});
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "Login first!" });
+  }
+  const allMails = await Mail.find({ from: user.email });
   const currDate = new Date();
   const filteredMails = allMails.filter((mail) => mail.nextDate < currDate);
   res.status(200).json(filteredMails);
@@ -66,7 +83,11 @@ mailsRouter.get("/past", async (req, res) => {
 
 mailsRouter.post("/", async (req, res) => {
   const body = req.body;
-
+  const user = req.user;
+  if (!user) {
+    res.status(400).json({ error: "Login first!" });
+  }
+  const from = user.email;
   const schedule = body.schedule;
 
   let currentDate = new Date();
@@ -96,6 +117,7 @@ mailsRouter.post("/", async (req, res) => {
 
   const newMail = new Mail({
     ...body,
+    from,
     nextDate,
     prevDate: nextDate,
   });

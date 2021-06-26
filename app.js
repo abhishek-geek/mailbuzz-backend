@@ -8,16 +8,11 @@ const cookieSession = require("cookie-session");
 const usersRouter = require("./router/users");
 const loginRouter = require("./router/login");
 const mailRouter = require("./router/mails");
+const middleware = require("./utils/middleware");
+require("./passport-setup");
 
 // connection to the MongoDB server
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+
 mongoose.connect(
   MONGODB_URI,
   {
@@ -33,47 +28,8 @@ mongoose.connect(
 
 app.use(cors());
 
-// app.use("*", function (req, res, next) {
-//   //replace localhost:8080 to the ip address:port of your server
-//   res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-//   res.header("Access-Control-Allow-Headers", "Content-Type");
-//   res.header("Access-Control-Allow-Credentials", true);
-//   next();
-// });
-
-//enable pre-flight
-// app.options("*", cors());
-// app.all("/*", function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   next();
-// });
-require("./passport-setup");
-
-// const corsOptions = {
-//   origin: "http://localhost:3003",
-//   credentials: true, //access-control-allow-credentials:true
-//   optionSuccessStatus: 200,
-// };
-// app.use(cors(corsOptions));
 app.use(express.json());
-// app.use(function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-//   next();
-// });
-// const { createProxyMiddleware } = require("http-proxy-middleware");
-// app.use(
-//   "/login/google  ",
-//   createProxyMiddleware({
-//     target: "http://localhost:3003/", //original url
-//     changeOrigin: true,
-//     //secure: false,
-//     onProxyRes: function (proxyRes, req, res) {
-//       proxyRes.headers["Access-Control-Allow-Origin"] = "*";
-//     },
-//   })
-// );
+app.use(middleware.logger);
 
 app.use(
   cookieSession({
@@ -105,7 +61,9 @@ app.get("/good", isLoggedIn, (req, res) => {
   res.status(200).send(req.user);
 });
 
-app.use("/mails", mailRouter);
+app.use(middleware.tokenExtractor);
+
+app.use("/mails", middleware.userExtractor, mailRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
 

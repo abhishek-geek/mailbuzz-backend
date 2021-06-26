@@ -18,7 +18,7 @@ passport.deserializeUser(async function (id, done) {
   // const user = await User.findById(id);
   // console.log("user =>", user);
   // done(null, user);
-  console.log(id);
+  console.log("id: ", id);
   User.findById(id).then((user) => {
     const userForToken = {
       username: user.username,
