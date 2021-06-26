@@ -1,0 +1,65 @@
+const mailsRouter = require("express").Router();
+const Mail = require("../model/mail");
+require("express-async-errors");
+
+mailsRouter.get("/", async (req, res) => {
+  const allMails = await Mail.find({});
+  res.status(200).json(allMails);
+});
+
+mailsRouter.get("/future", async (req, res) => {
+  const allMails = await Mail.find({});
+  const currDate = new Date();
+  const filteredMails = allMails.filter((mail) => mail.nextDate > currDate);
+  res.status(200).json(filteredMails);
+});
+
+mailsRouter.get("/past", async (req, res) => {
+  const allMails = await Mail.find({});
+  const currDate = new Date();
+  const filteredMails = allMails.filter((mail) => mail.nextDate < currDate);
+  res.status(200).json(filteredMails);
+});
+
+mailsRouter.post("/", async (req, res) => {
+  const body = req.body;
+
+  const schedule = body.schedule;
+
+  let currentDate = new Date();
+  let nextDate;
+  console.log(schedule);
+  switch (schedule) {
+    case "recurring":
+      nextDate = new Date(
+        currentDate.setSeconds(currentDate.getSeconds() + 10)
+      );
+      break;
+    case "daily":
+      nextDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+      break;
+    case "weekly":
+      nextDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+      break;
+    case "monthly":
+      nextDate = new Date(currentDate.setDate(currentDate.getDate() + 30));
+      break;
+    case "yearly":
+      nextDate = new Date(currentDate.setDate(currentDate.getDate() + 365));
+      break;
+  }
+
+  console.log(nextDate);
+
+  const newMail = new Mail({
+    ...body,
+    nextDate,
+    prevDate: nextDate,
+  });
+
+  const savedMail = await newMail.save();
+
+  res.status(201).json(savedMail);
+});
+
+module.exports = mailsRouter;

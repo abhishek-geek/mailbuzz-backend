@@ -7,6 +7,7 @@ const passport = require("passport");
 const cookieSession = require("cookie-session");
 const usersRouter = require("./router/users");
 const loginRouter = require("./router/login");
+const mailRouter = require("./router/mails");
 
 // connection to the MongoDB server
 app.use(function (req, res, next) {
@@ -104,6 +105,7 @@ app.get("/good", isLoggedIn, (req, res) => {
   res.status(200).send(req.user);
 });
 
+app.use("/mails", mailRouter);
 app.use("/users", usersRouter);
 app.use("/login", loginRouter);
 
