@@ -6,7 +6,9 @@ const nodemailer = require("./utils/nodemailer");
 const sendMails = async (time) => {
   setInterval(async () => {
     try {
-      const res = await axios.get("http://localhost:3003/mails/future/send");
+      const res = await axios.get(
+        "https://mailbuzz.herokuapp.com/mails/future/send"
+      );
       const mails = res.data;
       console.log("mails to send: ", mails);
       await nodemailer.send(mails);
@@ -47,7 +49,7 @@ const sendMails = async (time) => {
         };
         return mailObj;
       });
-      await axios.put("http://localhost:3003/mails/all", { newMails });
+      await axios.put("https://mailbuzz.herokuapp.com/mails/all", { newMails });
     } catch (e) {
       console.error(e.message);
     }
