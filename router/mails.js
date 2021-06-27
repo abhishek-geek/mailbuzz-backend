@@ -23,6 +23,42 @@ mailsRouter.get("/future", async (req, res) => {
   res.status(200).json(filteredMails);
 });
 
+mailsRouter.get("/future/send", async (req, res) => {
+  console.log("gett");
+  const allMails = await Mail.find();
+  // console.log("all: ", allMails);
+
+  const currDate = new Date();
+  const filteredMails = allMails.filter((mail) => {
+    return (
+      mail.nextDate.getTime() >= currDate.getTime() - 5000 &&
+      mail.nextDate.getTime() <= currDate.getTime() + 5000
+    );
+  });
+  console.log("filll: ", filteredMails);
+  res.status(200).json(filteredMails);
+});
+
+mailsRouter.put("/all", async (req, res) => {
+  console.log("Putting All....");
+
+  const newMails = req.body.newMails;
+
+  console.log("To be updated: ", newMails);
+
+  const promiseArray = newMails.map((mail) =>
+    Mail.findByIdAndUpdate(mail.id, mail, {
+      new: true,
+    })
+  );
+
+  console.log("promiseArr", promiseArray);
+
+  const saved = await Promise.all(promiseArray);
+  console.log("saved", saved);
+  res.status(201);
+});
+
 mailsRouter.put("/future/:id", async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -90,17 +126,25 @@ mailsRouter.post("/", async (req, res) => {
   const from = user.email;
   const schedule = body.schedule;
 
-  let currentDate = new Date();
+  const currentDate = new Date();
   let nextDate;
   console.log(schedule);
   switch (schedule) {
     case "recurring":
+      console.log(currentDate.getTime());
+
       nextDate = new Date(
         currentDate.setSeconds(currentDate.getSeconds() + 10)
       );
+      console.log(nextDate.getTime());
+
       break;
     case "daily":
+      console.log(currentDate.getTime());
       nextDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+      console.log(nextDate.getTime());
+      console.log(currentDate.getTime());
+      console.log("rem: ", nextDate.getTime() - currentDate.getTime());
       break;
     case "weekly":
       nextDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
