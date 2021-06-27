@@ -44,8 +44,8 @@ const send = (mails) => {
     const mailOptions = {
       from: "mailbuzz62@gmail.com",
       to: mail.to,
-      cc: mail.cc[0],
-      bcc: mail.bcc[0],
+      cc: mail.cc,
+      bcc: mail.bcc,
       subject: mail.subject,
       text: mail.body,
     };

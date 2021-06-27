@@ -12,11 +12,11 @@ const mailSchema = new mongoose.Schema({
     minLength: 3,
   },
   cc: {
-    type: Array,
+    type: String,
     minLength: 3,
   },
   bcc: {
-    type: Array,
+    type: String,
     minLength: 3,
   },
   subject: {
